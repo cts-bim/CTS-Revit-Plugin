@@ -1,0 +1,20 @@
+<Project>
+
+  <!--
+    Shared build settings.
+
+    RevitVersion  : 2023 | 2024 | 2025 | 2026
+                    Default for plain "dotnet build" / Visual Studio is 2024.
+                    Override with  dotnet build src\CTSRevitPlugin -p:RevitVersion=2025
+                    (or just run build.ps1 / Build.bat, which builds all of them).
+  -->
+  <PropertyGroup>
+    <RevitVersion Condition="'$(RevitVersion)' == ''">2024</RevitVersion>
+
+    <ArtifactsRoot>$(MSBuildThisFileDirectory)artifacts\</ArtifactsRoot>
+
+    <!-- Separate obj folder per Revit version so restores/builds never overwrite each other. -->
+    <BaseIntermediateOutputPath>$(ArtifactsRoot)obj\$(MSBuildProjectName)\$(RevitVersion)\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+
+</Project>

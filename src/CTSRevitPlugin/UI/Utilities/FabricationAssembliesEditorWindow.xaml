@@ -1,0 +1,168 @@
+<Window x:Class="CTSRevitPlugin.UI.Utilities.FabricationAssembliesEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="CTS Fabrication Assemblies - Configuration"
+        Width="1120" Height="760" MinWidth="900" MinHeight="620"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource TextBrush}">
+    <Window.Resources>
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Style.Triggers>
+                <Trigger Property="IsHighlighted" Value="True"><Setter Property="Background" Value="{DynamicResource SelectionBrush}"/></Trigger>
+                <Trigger Property="IsSelected" Value="True"><Setter Property="Background" Value="{DynamicResource SelectionBrush}"/></Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="Label" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/><Setter Property="FontSize" Value="9"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+        <Style x:Key="Input" TargetType="TextBox">
+            <Setter Property="Height" Value="32"/><Setter Property="Padding" Value="8,0"/><Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Background" Value="{DynamicResource InputBrush}"/><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+        </Style>
+        <!-- Native WPF dropdown binding: no mouse-event interception, item clicks reach the ComboBox. -->
+        <Style x:Key="Combo" TargetType="ComboBox">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Background" Value="{DynamicResource InputBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton x:Name="DropDownToggle" Focusable="False" ClickMode="Press"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                          Foreground="{TemplateBinding Foreground}"
+                                          TextElement.Foreground="{DynamicResource TextBrush}"
+                                          BorderThickness="1">
+                                <Grid>
+                                    <ContentPresenter Margin="8,0,26,0" VerticalAlignment="Center"
+                                                      HorizontalAlignment="Left" IsHitTestVisible="False"
+                                                      Content="{TemplateBinding SelectionBoxItem}"
+                                                      TextElement.Foreground="{DynamicResource TextBrush}"
+                                                      ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"/>
+                                    <Path Data="M 0 0 L 7 0 L 3.5 4 Z" Width="7" Height="4"
+                                          Fill="{DynamicResource TextSecondaryBrush}"
+                                          HorizontalAlignment="Right" VerticalAlignment="Center"
+                                          Margin="0,0,10,0" IsHitTestVisible="False"/>
+                                </Grid>
+                            </ToggleButton>
+                            <Popup x:Name="PART_Popup" Placement="Bottom" Focusable="False"
+                                   AllowsTransparency="True" StaysOpen="False"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}">
+                                <Border MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                        Background="{DynamicResource SurfaceBrush}"
+                                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+                                    <ScrollViewer MaxHeight="320" VerticalScrollBarVisibility="Auto">
+                                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="DropDownToggle" Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ButtonBase" TargetType="Button">
+            <Setter Property="Height" Value="30"/><Setter Property="Padding" Value="10,0"/><Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}"/><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        </Style>
+        <Style x:Key="AccentButton" TargetType="Button" BasedOn="{StaticResource ButtonBase}"><Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/><Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/><Setter Property="BorderThickness" Value="0"/><Setter Property="FontWeight" Value="SemiBold"/></Style>
+        <Style x:Key="TemplateItem" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="10,9"/><Setter Property="Margin" Value="0,2"/><Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}"/><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/><Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem"><Border x:Name="B" Background="{TemplateBinding Background}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="5" Padding="{TemplateBinding Padding}"><ContentPresenter/></Border><ControlTemplate.Triggers><Trigger Property="IsSelected" Value="True"><Setter TargetName="B" Property="Background" Value="{DynamicResource SelectionBrush}"/><Setter TargetName="B" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/></Trigger></ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <Border Grid.Row="0" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="12" Margin="0,0,0,10">
+            <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <Image x:Name="HeaderLogo" Width="38" Height="38" Stretch="Uniform" Margin="0,0,12,0"/>
+                <StackPanel Grid.Column="1"><TextBlock Text="CTS FABRICATION ASSEMBLIES" FontSize="16" FontWeight="Bold"/><TextBlock Text="Configure reusable fabrication sequences from the active Revit fabrication database" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,3,0,0"/></StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button Content="VIEW REFERENCE" Style="{StaticResource ButtonBase}" Click="ViewCapture_Click" Margin="0,0,6,0" ToolTip="Open the read-only model reference previously captured for this template"/>
+                    <Button Content="REFRESH DATABASE" Style="{StaticResource ButtonBase}" Click="Refresh_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="230"/><ColumnDefinition Width="360"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="10" Margin="0,0,8,0">
+                <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <TextBlock Text="MY ASSEMBLIES" FontSize="11" FontWeight="Bold" Margin="0,0,0,8"/>
+                    <ListBox Grid.Row="1" x:Name="TemplateList" BorderThickness="0" Background="Transparent" ItemContainerStyle="{StaticResource TemplateItem}" SelectionChanged="TemplateList_SelectionChanged"/>
+                    <Grid Grid.Row="2" Margin="0,8,0,0"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <Button Content="+ NEW" Style="{StaticResource ButtonBase}" Click="New_Click" Margin="0,0,4,0"/><Button Grid.Column="1" Content="RENAME" Style="{StaticResource ButtonBase}" Click="Rename_Click" Margin="2,0,2,0"/><Button Grid.Column="2" Content="DELETE" Style="{StaticResource ButtonBase}" Click="Delete_Click" Margin="4,0,0,0"/>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="1" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="10" Margin="0,0,8,0">
+                <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <TextBlock Text="ASSEMBLY TEMPLATE" FontSize="11" FontWeight="Bold" Margin="0,0,0,8"/>
+                    <TextBox Grid.Row="1" x:Name="TemplateNameTextBox" Style="{StaticResource Input}" TextChanged="TemplateName_TextChanged"/>
+                    <Grid Grid.Row="2" Margin="0,8"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <StackPanel Margin="0,0,6,0"><TextBlock Text="PART DIAMETER" Style="{StaticResource Label}"/><ComboBox x:Name="DiameterComboBox" Style="{StaticResource Combo}" SelectionChanged="Diameter_SelectionChanged" ToolTip="Auto uses the diameter of the O-Let open connector. Explicit overrides may fail if the connectors do not match."/></StackPanel>
+                        <Border Grid.Column="1" Margin="6,0,0,0" Background="{DynamicResource StatusBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="8">
+                            <StackPanel><TextBlock Text="PLACEMENT ANCHOR" Style="{StaticResource Label}" Margin="0"/><TextBlock Text="O-Let Weld Gap" Foreground="{DynamicResource TextBrush}" FontSize="10" FontWeight="SemiBold"/><TextBlock Text="Place it manually in Revit; the plugin will use the selected O-Let as the starting connector." Foreground="{DynamicResource TextMutedBrush}" FontSize="8" TextWrapping="Wrap" Margin="0,2,0,0"/></StackPanel>
+                        </Border>
+                    </Grid>
+                    <Grid Grid.Row="3"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                        <Grid Grid.Row="0"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="PART SEQUENCE" FontSize="10" FontWeight="Bold" Margin="0,0,0,7"/><TextBlock Grid.Column="1" x:Name="SequenceCountText" Foreground="{DynamicResource TextMutedBrush}" FontSize="9"/></Grid>
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"><StackPanel x:Name="SequencePanel"/></ScrollViewer>
+                        <Border Grid.Row="2" Background="{DynamicResource StatusBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Margin="0,6,0,0" Padding="7">
+                            <StackPanel>
+                                <TextBlock x:Name="PartDetailsText" Text="Select a sequence item to see captured identity, length and variation." FontSize="9" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
+                                <Button x:Name="ReplaceSelectedButton" Content="REPLACE SELECTED (NEXT CATALOG CLICK)" Style="{StaticResource ButtonBase}" Margin="0,5,0,0" Click="ReplaceSelected_Click" IsEnabled="False" ToolTip="Select a non-anchor sequence item, then choose a different item OR a ▼ length/type variation in the database. Does not append a part."/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                    <Grid Grid.Row="4" Margin="0,8,0,0"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <Button Content="↑" Width="38" Style="{StaticResource ButtonBase}" Click="MoveUp_Click" Margin="0,0,4,0"/><Button Grid.Column="1" Content="↓" Width="38" Style="{StaticResource ButtonBase}" Click="MoveDown_Click" Margin="0,0,4,0"/><Button Grid.Column="2" Content="REMOVE SELECTED" Style="{StaticResource ButtonBase}" HorizontalAlignment="Left" Click="Remove_Click"/><Button Grid.Column="3" Content="SAVE" Width="90" Style="{StaticResource AccentButton}" Click="Save_Click"/>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="2" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="10">
+                <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <Grid Grid.Row="0"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="170"/></Grid.ColumnDefinitions><TextBlock Text="REVIT FABRICATION DATABASE" FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/><TextBox Grid.Column="1" x:Name="SearchTextBox" Style="{StaticResource Input}" Height="30" TextChanged="Search_TextChanged" ToolTip="Search by part name or code"/></Grid>
+                    <Grid Grid.Row="1" Margin="0,8">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <StackPanel Margin="0,0,5,0">
+                        <TextBlock Text="SERVICE (CATALOG ONLY)" Style="{StaticResource Label}"/>
+                        <ComboBox x:Name="ServiceComboBox" Style="{StaticResource Combo}"
+                                  DisplayMemberPath="Name" SelectionChanged="Service_SelectionChanged"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                        <TextBlock Text="PALETTE" Style="{StaticResource Label}"/>
+                        <ComboBox x:Name="PaletteComboBox" Style="{StaticResource Combo}"
+                                  DisplayMemberPath="Name" SelectionChanged="Palette_SelectionChanged"/>
+                    </StackPanel>
+                </Grid>
+                    <Grid Grid.Row="2">
+                        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                        <TextBlock x:Name="CatalogStatusText" Foreground="{DynamicResource TextMutedBrush}" FontSize="9" Margin="0,0,0,5" TextTrimming="CharacterEllipsis"/>
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"><WrapPanel x:Name="CatalogPanel"/></ScrollViewer>
+                    </Grid>
+                    <Border Grid.Row="3" Background="{DynamicResource StatusBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="5" Padding="8" Margin="0,8,0,0"><TextBlock Text="CAPTURE an existing assembly to learn the exact button + ITM/condition. In your catalog, ▼ can choose NIPPLE LENGTH (x1.5, x3...) or connection type; diameter still comes from the O-Let. Select a sequence row and use REPLACE SELECTED before choosing a tile/▼ to change that piece for a client. No arbitrary Threaded/Socketweld substitutions." Foreground="{DynamicResource TextSecondaryBrush}" FontSize="9" TextWrapping="Wrap"/></Border>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="2" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="8" Margin="0,10,0,0">
+            <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><Image x:Name="FooterCtsLogo" Width="28" Height="28"/><TextBlock Grid.Column="1" x:Name="StatusText" Text="Ready" VerticalAlignment="Center" Margin="10,0" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="9" TextWrapping="Wrap"/><Image Grid.Column="2" x:Name="FooterMotto" Width="120" Height="22" Stretch="Uniform"/></Grid>
+        </Border>
+    </Grid>
+</Window>

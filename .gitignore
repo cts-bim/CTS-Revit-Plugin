@@ -1,0 +1,12 @@
+# build output (per Revit version)
+artifacts/
+dist/
+
+# classic .NET output, in case something is built the old way
+bin/
+obj/
+
+# IDE
+.vs/
+*.user
+*.suo

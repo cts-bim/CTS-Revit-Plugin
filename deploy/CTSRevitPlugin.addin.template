@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>CTS Revit Plugin</Name>
+    <Assembly>__ASSEMBLY__</Assembly>
+    <AddInId>7D7E0D90-2C0A-4B91-9B4C-6D0D2D0A2024</AddInId>
+    <FullClassName>CTSRevitPlugin.App</FullClassName>
+    <VendorId>CTS</VendorId>
+    <VendorDescription>CTS BIM</VendorDescription>
+  </AddIn>
+</RevitAddIns>

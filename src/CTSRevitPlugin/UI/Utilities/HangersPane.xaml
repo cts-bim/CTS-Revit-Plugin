@@ -1,0 +1,135 @@
+<Page x:Class="CTSRevitPlugin.UI.Utilities.HangersPane"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="{DynamicResource WindowBackgroundBrush}">
+    <Page.Resources>
+        <Style x:Key="ToolButtonStyle" TargetType="Button">
+            <Setter Property="MinHeight" Value="34"/>
+            <Setter Property="Margin" Value="0,3"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="11"/>
+        </Style>
+        <Style x:Key="SmallButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="38"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style x:Key="SectionExpanderStyle" TargetType="Expander">
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        </Style>
+        <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Border Width="34" Height="34" Background="Transparent" CornerRadius="7" Margin="0,0,10,0">
+                    <Image x:Name="HeaderLogo" Stretch="Uniform" Margin="5"/>
+                </Border>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="CTS HANGERS" Foreground="{DynamicResource TextBrush}" FontSize="15" FontWeight="Bold"/>
+                    <TextBlock Text="Hanger tools &amp; adjustment" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" Margin="0,2,0,0"/>
+                </StackPanel>
+                <Button Grid.Column="2" Content="⚙" Width="32" Height="32" Background="Transparent" Foreground="{DynamicResource TextSecondaryBrush}" BorderThickness="0" FontSize="18" Click="SettingsButton_Click" ToolTip="Utilities settings"/>
+            </Grid>
+        </Border>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="12">
+                <Expander x:Name="HostExpander" Header="HOST" IsExpanded="True" Style="{StaticResource SectionExpanderStyle}">
+                    <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="8">
+                        <StackPanel x:Name="HostToolsPanel"/>
+                    </Border>
+                </Expander>
+
+                <Expander x:Name="AdjusterExpander" Header="ADJUSTER" IsExpanded="True" Style="{StaticResource SectionExpanderStyle}">
+                    <StackPanel>
+                        <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="9" Margin="0,0,0,8">
+                            <StackPanel>
+                                <TextBlock Text="ROD LENGTH" Foreground="{DynamicResource TextBrush}" FontSize="10" FontWeight="Bold" Margin="0,0,0,6"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="38"/>
+                                        <ColumnDefinition Width="38"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" x:Name="RodAdjustmentTextBox" Text="2&quot;" Height="32" Margin="0,0,6,0" Padding="8,0" VerticalContentAlignment="Center" Background="{DynamicResource InputBrush}" Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource InputBorderBrush}" FontSize="12" ToolTip="Rod length adjustment"/>
+                                    <Button Grid.Column="1" Content="−" Style="{StaticResource SmallButtonStyle}" Click="DecreaseRodButton_Click"/>
+                                    <Button Grid.Column="2" Content="+" Style="{StaticResource SmallButtonStyle}" Click="IncreaseRodButton_Click" Margin="6,0,0,0"/>
+                                </Grid>
+                                <TextBlock x:Name="HangerAdjustmentStatus" Text="Select a fabrication hanger" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" Margin="0,7,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="9" Margin="0,0,0,8">
+                            <StackPanel>
+                                <TextBlock Text="ROUND STRUT CHANNEL" Foreground="{DynamicResource TextBrush}" FontSize="10" FontWeight="Bold" Margin="0,0,0,6"/>
+                                <Button x:Name="RoundStrutButton" Content="ROUND TO NEAREST INCH" Height="34" Padding="10,4" Background="{DynamicResource SurfaceAltBrush}" Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource BorderBrush}" Click="RoundStrutButton_Click" ToolTip="Round the hanger's horizontal strut/bearer length to the nearest whole inch."/>
+                                <TextBlock Text="Rounds the editable horizontal strut/bearer dimension. It does not resize the hanger family." Foreground="{DynamicResource TextSecondaryBrush}" FontSize="9" Margin="0,6,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="9">
+                            <StackPanel>
+                                <TextBlock Text="STRUT CHANNEL" Foreground="{DynamicResource TextBrush}" FontSize="10" FontWeight="Bold" Margin="0,0,0,6"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="38"/>
+                                        <ColumnDefinition Width="38"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" x:Name="StrutAdjustmentTextBox" Text="2&quot;" Height="32" Margin="0,0,6,0" Padding="8,0" VerticalContentAlignment="Center" Background="{DynamicResource InputBrush}" Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource InputBorderBrush}" FontSize="12" ToolTip="Strut channel adjustment"/>
+                                    <Button Grid.Column="1" Content="−" Style="{StaticResource SmallButtonStyle}" Click="DecreaseStrutButton_Click"/>
+                                    <Button Grid.Column="2" Content="+" Style="{StaticResource SmallButtonStyle}" Click="IncreaseStrutButton_Click" Margin="6,0,0,0"/>
+                                </Grid>
+                                <TextBlock x:Name="StrutAdjustmentStatus" Text="Select a fabrication hanger" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" Margin="0,7,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Expander>
+
+                <Border Background="{DynamicResource StatusBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="9" Margin="0,2,0,0">
+                    <TextBlock x:Name="StatusText" Text="Ready" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" TextWrapping="Wrap"/>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <Border Grid.Row="2" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Padding="10,7">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Image x:Name="FooterCtsLogo" Width="30" Height="30" Stretch="Uniform"/>
+                <Image x:Name="FooterMotto" Grid.Column="1" Height="24" Stretch="Uniform" HorizontalAlignment="Right"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

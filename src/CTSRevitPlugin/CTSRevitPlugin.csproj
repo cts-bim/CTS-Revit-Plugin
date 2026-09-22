@@ -1,0 +1,114 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    One project, four Revit versions.
+
+    RevitVersion comes from ../../Directory.Build.props (default 2024) or from the
+    command line:   dotnet build -p:RevitVersion=2025
+
+      Revit 2023, 2024  ->  .NET Framework 4.8
+      Revit 2025, 2026  ->  .NET 8 (net8.0-windows)
+
+    Output: <repo>\artifacts\bin\<RevitVersion>\<Configuration>\CTSRevitPlugin.dll
+  -->
+
+  <PropertyGroup Condition="'$(RevitVersion)' == '2023' Or '$(RevitVersion)' == '2024'">
+    <TargetFramework>net48</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(RevitVersion)' == '2025' Or '$(RevitVersion)' == '2026'">
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyName>CTSRevitPlugin</AssemblyName>
+    <RootNamespace>CTSRevitPlugin</RootNamespace>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>8.0</LangVersion>
+
+    <AssemblyTitle>CTS Revit Plugin</AssemblyTitle>
+    <Description>CTS BIM Revit Plugin</Description>
+    <Company>CTS BIM</Company>
+    <Product>CTS Revit Plugin</Product>
+    <Copyright>Copyright © 2026 CTS BIM</Copyright>
+    <Version>5.0.0</Version>
+    <AssemblyVersion>5.0.0.0</AssemblyVersion>
+    <FileVersion>5.0.0.0</FileVersion>
+
+    <UseWPF>true</UseWPF>
+    <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
+    <EnableDefaultPageItems>true</EnableDefaultPageItems>
+
+    <!-- One output folder per Revit version, outside the source tree. -->
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>$(ArtifactsRoot)bin\$(RevitVersion)\$(Configuration)\</OutputPath>
+
+    <!-- Symbols used by the #if blocks: REVIT2023 ... REVIT2026, REVIT20xx_OR_GREATER -->
+    <DefineConstants>$(DefineConstants);REVIT$(RevitVersion)</DefineConstants>
+
+    <!-- Never pick up stray bin\obj folders that may exist inside the source folder. -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);bin\**;obj\**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(RevitVersion)' != '2023'">
+    <DefineConstants>$(DefineConstants);REVIT2024_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(RevitVersion)' == '2025' Or '$(RevitVersion)' == '2026'">
+    <DefineConstants>$(DefineConstants);REVIT2025_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(RevitVersion)' == '2026'">
+    <DefineConstants>$(DefineConstants);REVIT2026_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+
+  <!--
+    Revit API references.
+    - If Revit <RevitVersion> is installed (default path), its RevitAPI.dll / RevitAPIUI.dll are used.
+    - Otherwise the Nice3point.Revit.Api.* NuGet packages are used, so you can build every
+      version on a machine that only has some of them installed.
+    Force one or the other with:  -p:UseRevitNuGet=true  /  -p:UseRevitNuGet=false
+    Custom install path:          -p:RevitInstallDir="D:\Revit 2025\"
+  -->
+  <PropertyGroup>
+    <RevitInstallDir Condition="'$(RevitInstallDir)' == ''">$(ProgramW6432)\Autodesk\Revit $(RevitVersion)\</RevitInstallDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(UseRevitNuGet)' == '' And Exists('$(RevitInstallDir)RevitAPI.dll') And Exists('$(RevitInstallDir)RevitAPIUI.dll')">
+    <UseRevitNuGet>false</UseRevitNuGet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(UseRevitNuGet)' == ''">
+    <UseRevitNuGet>true</UseRevitNuGet>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(UseRevitNuGet)' == 'false'">
+    <Reference Include="RevitAPI">
+      <HintPath>$(RevitInstallDir)RevitAPI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>$(RevitInstallDir)RevitAPIUI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseRevitNuGet)' == 'true'">
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" PrivateAssets="all" ExcludeAssets="runtime" />
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" PrivateAssets="all" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <!-- .NET Framework 4.8 needs the desktop assemblies listed; on .NET 8 they come with UseWPF / UseWindowsForms. -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\Icons\*.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

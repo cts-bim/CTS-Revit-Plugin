@@ -1,0 +1,134 @@
+<Page x:Class="CTSRevitPlugin.UI.ElementFilter.ElementFilterPane"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="{DynamicResource WindowBackgroundBrush}">
+    <Page.Resources>
+        <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+            <Setter Property="Padding" Value="10,3"/>
+            <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="10"/>
+        </Style>
+        <Style x:Key="ActionTileStyle" TargetType="Button">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Margin" Value="0,0,6,6"/>
+            <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <Border Grid.Row="0" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Border Width="34" Height="34" Background="Transparent" CornerRadius="7" Margin="0,0,10,0">
+                    <Image x:Name="HeaderLogo" Stretch="Uniform" Margin="5"/>
+                </Border>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="CTS ELEMENT FILTER" Foreground="{DynamicResource TextBrush}" FontSize="15" FontWeight="Bold"/>
+                    <TextBlock x:Name="HeaderSubtitle" Text="Rule-based select, isolate, hide and override" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" Margin="0,2,0,0"/>
+                </StackPanel>
+                <Button Grid.Column="2" Content="+" Width="32" Height="32" Background="Transparent" Foreground="{DynamicResource TextSecondaryBrush}" BorderThickness="0" FontSize="20" FontWeight="SemiBold" Click="NewButton_Click" ToolTip="Create a new filter"/>
+            </Grid>
+        </Border>
+
+        <!-- BODY -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="12">
+
+                <Button Content="RESET VIEW" Height="32" Margin="0,0,0,10"
+                        Background="{DynamicResource SurfaceAltBrush}" Foreground="{DynamicResource TextBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" FontSize="11" FontWeight="Bold"
+                        Click="ResetViewButton_Click"
+                        ToolTip="Undo Isolate, Hide, Halftone and Transparency applied by this tool."/>
+
+                <TextBlock Text="FILTERS" Style="{StaticResource SectionHeaderStyle}" Margin="0,0,0,8"/>
+
+                <TextBox x:Name="SearchTextBox" Height="30" Margin="0,0,0,8" Padding="8,0"
+                         VerticalContentAlignment="Center" FontSize="11"
+                         Background="{DynamicResource InputBrush}" Foreground="{DynamicResource TextBrush}"
+                         BorderBrush="{DynamicResource InputBorderBrush}"
+                         ToolTip="Filter this list by name"
+                         TextChanged="SearchTextBox_TextChanged"/>
+
+                <StackPanel x:Name="FiltersPanel"/>
+
+                <TextBlock x:Name="EmptyText"
+                           Text="No filters yet. Press + to create one, or IMPORT a file shared by your project lead."
+                           Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" TextWrapping="Wrap"
+                           Visibility="Collapsed" Margin="0,0,0,8"/>
+
+                <StackPanel Orientation="Horizontal" Margin="0,6,0,4">
+                    <Button Content="IMPORT" Style="{StaticResource ActionButtonStyle}" Click="ImportButton_Click" ToolTip="Load filters from a file shared by your project lead."/>
+                    <Button Content="EXPORT" Style="{StaticResource ActionButtonStyle}" Click="ExportButton_Click" ToolTip="Save these filters to a file you can send to the rest of the project."/>
+                </StackPanel>
+
+                <!-- SELECTED FILTER -->
+                <Border x:Name="DetailsCard" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="10" Margin="0,6,0,8" Visibility="Collapsed">
+                    <StackPanel>
+                        <TextBlock x:Name="DetailName" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock x:Name="DetailSummary" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" TextWrapping="Wrap"/>
+
+                        <TextBlock Text="CONDITIONS" Style="{StaticResource SectionHeaderStyle}" Margin="0,10,0,4"/>
+                        <StackPanel x:Name="ConditionsPanel"/>
+
+                        <TextBlock Text="ACTION" Style="{StaticResource SectionHeaderStyle}" Margin="0,12,0,6"/>
+                        <UniformGrid Columns="2">
+                            <Button Content="SELECT" Style="{StaticResource ActionTileStyle}" Click="SelectAction_Click"/>
+                            <Button Content="ISOLATE" Style="{StaticResource ActionTileStyle}" Click="IsolateAction_Click"/>
+                            <Button Content="HIDE" Style="{StaticResource ActionTileStyle}" Click="HideAction_Click"/>
+                            <Button Content="HALFTONE" Style="{StaticResource ActionTileStyle}" Click="HalftoneAction_Click"/>
+                            <Button x:Name="TransparencyButton" Content="TRANSPARENCY" Style="{StaticResource ActionTileStyle}" Click="TransparencyAction_Click"/>
+                        </UniformGrid>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button Content="EDIT" Style="{StaticResource ActionButtonStyle}" Click="EditButton_Click" ToolTip="Change the categories and conditions"/>
+                            <Button Content="DUPLICATE" Style="{StaticResource ActionButtonStyle}" Click="DuplicateButton_Click" ToolTip="Create a copy to adapt"/>
+                            <Button Content="DELETE" Style="{StaticResource ActionButtonStyle}" Click="DeleteButton_Click" ToolTip="Remove this filter"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="{DynamicResource StatusBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="9" Margin="0,2,0,0">
+                    <TextBlock x:Name="StatusText" Text="Ready" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" TextWrapping="Wrap"/>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- FOOTER -->
+        <Border Grid.Row="2" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Padding="10,7">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Image x:Name="FooterCtsLogo" Width="30" Height="30" Stretch="Uniform"/>
+                <Image x:Name="FooterMotto" Grid.Column="1" Height="24" Stretch="Uniform" HorizontalAlignment="Right"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

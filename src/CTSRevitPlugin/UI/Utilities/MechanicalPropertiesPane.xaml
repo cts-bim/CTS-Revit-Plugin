@@ -1,0 +1,186 @@
+<Page x:Class="CTSRevitPlugin.UI.Utilities.MechanicalPropertiesPane"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="{DynamicResource WindowBackgroundBrush}">
+    <Page.Resources>
+
+        <!-- Label column. Always readable: the brush follows the theme. -->
+        <Style x:Key="Cell" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Margin" Value="6,5"/>
+        </Style>
+
+        <!-- Value column for rows that cannot be written back. The reference
+             browser greys these; TextMutedBrush is the theme's equivalent and
+             stays legible on both the light and the dark background. -->
+        <Style x:Key="CellReadOnly" TargetType="TextBlock" BasedOn="{StaticResource Cell}">
+            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
+        </Style>
+
+        <Style x:Key="RowButton" TargetType="Button">
+            <Setter Property="Width" Value="22"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="2,0,0,0"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Section header. Doubles as the collapse toggle. -->
+        <Style x:Key="SectionHeader" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="Margin" Value="0,6,0,2"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <Style x:Key="FooterButton" TargetType="Button">
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <Border Grid.Row="0" Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Image x:Name="HeaderLogo" Width="38" Height="38" Stretch="Uniform" Margin="0,0,10,0"/>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="CTS MECHANICAL PROPERTIES"
+                               Foreground="{DynamicResource TextBrush}" FontSize="15" FontWeight="Bold"/>
+                    <TextBlock x:Name="HeaderSubtitle" Text="Select an MEP Fabrication element"
+                               Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" Margin="0,2,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- BODY -->
+        <Grid Grid.Row="1" Margin="12">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                    CornerRadius="8" Padding="8" Margin="0,0,0,8">
+                <TextBox x:Name="SearchTextBox" Height="32" Padding="9,0" VerticalContentAlignment="Center"
+                         Text="Search properties" Foreground="{DynamicResource TextMutedBrush}"
+                         Background="{DynamicResource InputBrush}" BorderBrush="{DynamicResource InputBorderBrush}"
+                         ToolTip="Search properties"
+                         GotFocus="SearchTextBox_GotFocus" LostFocus="SearchTextBox_LostFocus"
+                         TextChanged="SearchTextBox_TextChanged"/>
+            </Border>
+
+            <Border Grid.Row="1" Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                    CornerRadius="8" Padding="10" Margin="0,0,0,10">
+                <UniformGrid Columns="4">
+                    <StackPanel>
+                        <TextBlock Text="ELEMENT ID" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="9"/>
+                        <TextBlock x:Name="IdText" Foreground="{DynamicResource TextBrush}" FontSize="12" FontWeight="SemiBold"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="CATEGORY" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="9"/>
+                        <TextBlock x:Name="CategoryText" Foreground="{DynamicResource TextBrush}" FontSize="12"
+                                   FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="FAMILY" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="9"/>
+                        <TextBlock x:Name="FamilyText" Foreground="{DynamicResource TextBrush}" FontSize="12"
+                                   FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="TYPE" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="9"/>
+                        <TextBlock x:Name="TypeText" Foreground="{DynamicResource TextBrush}" FontSize="12"
+                                   FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                </UniformGrid>
+            </Border>
+
+            <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1" CornerRadius="8">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel x:Name="PropertiesPanel" Margin="5"/>
+                    </ScrollViewer>
+                </Border>
+
+                <!-- Refresh scope + Apply. Apply stays disabled until something
+                     is actually pending, so one transaction covers one edit set. -->
+                <Grid Grid.Row="1" Margin="0,8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button x:Name="RefreshButton" Grid.Column="0" Content="REFRESH"
+                            Style="{StaticResource FooterButton}" Click="Refresh_Click"
+                            ToolTip="Re-read the current selection from the model."/>
+
+                    <Button x:Name="ApplyButton" Grid.Column="3" Content="APPLY"
+                            Style="{StaticResource FooterButton}" IsEnabled="False" Click="Apply_Click"
+                            Background="{DynamicResource PrimaryBrush}"
+                            Foreground="{DynamicResource AccentTextBrush}"
+                            BorderThickness="0"
+                            ToolTip="Write the pending changes back to the selected element(s)."/>
+                </Grid>
+
+                <Border Grid.Row="2" Background="{DynamicResource StatusBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                        CornerRadius="7" Padding="9" Margin="0,8,0,0">
+                    <TextBlock x:Name="StatusText" Text="Ready"
+                               Foreground="{DynamicResource TextSecondaryBrush}" FontSize="10" TextWrapping="Wrap"/>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- FOOTER -->
+        <Border Grid.Row="2" Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Padding="10,7">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Image x:Name="FooterCtsLogo" Width="30" Height="30" Stretch="Uniform"/>
+                <Image x:Name="FooterMotto" Grid.Column="1" Height="24" Stretch="Uniform" HorizontalAlignment="Right"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>
